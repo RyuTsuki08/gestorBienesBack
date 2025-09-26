@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build: .  # Usa el Dockerfile
+    ports:
+      - "3000:3000"  # Expone tu app en localhost:3000
+    environment:
+      - NODE_ENV=local  # Fuerza entorno local
+    volumes:
+      - .:/app  # Monta código fuente para hot-reload en dev (opcional, quítalo en prod)
+      - /app/node_modules  # Evita sobrescribir node_modules del contenedor
+    depends_on:
+      - postgres
+    env_file:
+      - .env.local  # Carga vars (DB_HOST=postgres, etc.)
+
+  postgres:
+    image: postgres:14-alpine  # Ligero
+    environment:
+      POSTGRES_DB: ${DB_NAME:-gestion_bienes_local}  # De .env.local o default
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5432:5432"  # Accede localmente si necesitas pgAdmin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persiste DB
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Opcional: Script init DB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:  # Volumen nombrado para persistencia

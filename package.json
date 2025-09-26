@@ -1,0 +1,35 @@
+{
+  "name": "gestorbienesback",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+      "dev": "nodemon --exec ts-node src/server.ts",
+      "build": "tsc && prisma generate",  
+      "start": "node dist/server.js",
+    "prisma:generate": "prisma generate --env-file .env.local",
+    "prisma:studio": "prisma studio --env-file .env.local",
+    "prisma:push": "prisma db push --env-file .env.local",
+    "prisma:migrate": "prisma migrate dev --env-file .env.local",
+      "docker:local": "docker-compose up --build",
+      "docker:dev": "docker-compose -f docker-compose.supabase.yml up --build",
+      "docker:down": "docker-compose down"
+    },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.2",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.16.2",
+    "ts-node": "^10.9.2"
+  }
+}

@@ -10,8 +10,165 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Example {  // Modelo placeholder; lo reemplazaremos con tus tablas
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Ambiente {
+  idambiente           Int             @id @default(autoincrement()) @map("idambiente")
+  nombreambiente       String?         @map("nombreambiente")
+  idunidaddetrabajo    Int?            @default(0) @map("idunidaddetrabajo")
+  trial041             String?         @db.Char(1) @map("trial041")
+
+  transferenciasOrigen Transferencia[] @relation("TransferenciaAmbienteOrigen")
+
+  @@map("ambientes")
+}
+
+model Bien {
+  inventario             String     @id @map("inventario")
+  descripcion            String?    @map("descripción")
+  idsubgrupo             Int?       @default(0) @map("idsubgrupo")
+  idseccion              Int?       @default(0) @map("idsección")
+  valor                  Float?     @default(0) @map("valor")
+  idunidaddetrabajo      Int?       @default(0) @map("idunidaddetrabajo")
+  idambiente             Int?       @default(0) @map("idambiente")
+  factura                String?    @map("factura")
+  fechafactura           DateTime?  @db.Timestamp(6) @map("fechafactura")
+  fechaincorporacion     DateTime?  @db.Timestamp(6) @map("fechaincorporación")
+  desincorporado         Boolean    @default(false) @map("desincorporado")
+  robado                 Boolean    @default(false) @map("robado")
+  chatarra               Boolean    @default(false) @map("chatarra")
+  fechadesincorporacion  DateTime?  @db.Timestamp(6) @map("fechadesincorporación")
+  vidautil               Int?       @map("vidaútil")
+  valorDeRecuperacion    Int?       @map("valorderecuparación")
+  valorDeDepreciacion    Int?       @map("valordedepreciación")
+  faltante               Boolean    @default(false) @map("faltante")
+  esperafactura          Boolean    @default(false) @map("esperafactura")
+  inoperativo            Boolean    @default(false) @map("inoperativo")
+  otrosmemo              String?    @map("otrosmemo")
+  fuerademural           Boolean    @default(false) @map("fuerademural")
+  observaciones          String?    @map("observaciones")
+  codigop                String?    @map("códigop")
+  vehiculo               Boolean    @default(false) @map("vehículo")
+  maquinaria             Boolean    @default(false) @map("maquinaria")
+  marcadorGrupal         Boolean    @default(false) @map("marcador grupal")
+  mantenimiento          Boolean    @default(false) @map("mantenimiento")
+  esrecolector           Boolean    @default(false) @map("esrecolector")
+  moto                   Boolean    @default(false) @map("moto")
+  inspeccion             Boolean    @default(false) @map("inspección")
+  fechainspeccion        DateTime?  @db.Timestamp(6) @map("fechainspeccion")
+  iddependencias         Int?       @map("iddependencias")
+  deteriorado            Boolean    @default(false) @map("deteriorado")
+  codigopresupuestario   String?    @map("codigopresupuestario")
+  sc                     Boolean    @default(false) @map("sc")
+  valorsoberano          Float?     @map("valorsoberano")
+  trial054               String?    @db.Char(1) @map("trial054")
+  obsoleto               Boolean?   @map("obsoleto")
+  denuncia               String?    @map("denuncia")
+  fechadenuncia          DateTime?  @db.Timestamp(6) @map("fechadenuncia")
+  asignado               String?    @map("asignado")
+
+  dependencia            Dependencia?     @relation(fields: [iddependencias], references: [iddependencias])
+  unidadDeTrabajo        UnidadDeTrabajo? @relation(fields: [idunidaddetrabajo], references: [idunidaddetrabajo])
+  imagenes               Imagen[]
+  transferencias         Transferencia[]
+
+  @@map("bienes")
+}
+
+model Dependencia {
+  iddependencias Int    @id @default(autoincrement()) @map("iddependencias")
+  dependencia    String? @map("dependencia")
+  trial048       String? @db.Char(1) @map("trial048")
+
+  bienes         Bien[]
+
+  @@map("dependencias")
+}
+
+model Grupo {
+  idgrupo     Int     @id @default(autoincrement()) @map("idgrupo")
+  nombregrupo String? @map("nombregrupo")
+  trial061    String? @db.Char(1) @map("trial061")
+
+  @@map("grupo")
+}
+
+model Imagen {
+  id         Int     @id @default(autoincrement()) @map("id")
+  inventario String  @map("inventario")
+  url        String? @map("url")
+
+  bien Bien @relation(fields: [inventario], references: [inventario])
+
+  @@map("imagenes")
+}
+
+model Seccion {
+  idseccion      Int     @id @default(autoincrement()) @map("idsección")
+  nombreseccion  String? @map("nombresección")
+  idsubgrupo     Int?    @map("idsubgrupo")
+  trial067       String? @db.Char(1) @map("trial067")
+
+  subgrupo Subgrupo? @relation(fields: [idsubgrupo], references: [idsubgrupo])
+
+  @@map("sección")
+}
+
+model Subgrupo {
+  idsubgrupo     Int      @id @default(autoincrement()) @map("idsubgrupo")
+  nombresubgrupo String?  @map("nombresubgrupo")
+  trial064       String?  @db.Char(1) @map("trial064")
+
+  secciones Seccion[]
+
+  @@map("subgrupo")
+}
+
+model Transferencia {
+  idtransferencia        Int       @id @default(autoincrement()) @map("idtransferencia")
+  inventario             String?   @map("inventario")
+  idunidaddetrabajoorigen  Int?    @map("idunidaddetrabajoorigen")
+  idambienteorigen       Int?      @map("idambienteorigen")
+  idunidaddetrabajodestino Int?    @map("idunidaddetrabajodestino")
+  idambientedestino      Int?      @map("idambientedestino")
+  fechatransferencia     DateTime? @db.Timestamp(6) @map("fechatransferencia")
+  imprimir               Boolean   @default(true)  @map("imprimir")
+  procesar               Boolean   @default(false) @map("procesar")
+  trial070               String?   @db.Char(1) @map("trial070")
+
+  bien            Bien?     @relation(fields: [inventario], references: [inventario])
+  ambienteOrigen  Ambiente? @relation("TransferenciaAmbienteOrigen", fields: [idambienteorigen], references: [idambiente])
+
+  @@map("transferencias")
+}
+
+model UnidadDeTrabajo {
+  idunidaddetrabajo Int     @id @default(autoincrement()) @map("idunidaddetrabajo")
+  unidaddetrabajo   String? @map("unidaddetrabajo")
+  localizacion      String? @map("localización")
+  jupiter           String? @map("júpiter")
+  telefono          String? @map("teléfono")
+  trial051          String? @db.Char(1) @map("trial051")
+
+  bienes Bien[]
+
+  @@map("unidad de trabajo")
 }

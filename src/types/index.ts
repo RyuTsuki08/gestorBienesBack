@@ -1,8 +1,6 @@
 // Enums
-export enum Role {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-}
+import { Role } from '@prisma/client';
+export { Role };
 
 // Interfaces para modelos (complemento a tipos generados por Prisma)
 export interface IUser {
@@ -16,29 +14,29 @@ export interface IUser {
 
 export interface IBien {
   inventario: string;
-  descripcion?: string;
-  idsubgrupo?: number;
-  idseccion?: number;
-  valor?: number;
-  idunidaddetrabajo?: number;
-  idambiente?: number;
-  factura?: string;
-  fechafactura?: Date;
-  fechaincorporacion?: Date;
+  descripcion: string | null;
+  idsubgrupo: number | null;
+  idseccion: number | null;
+  valor: number | null;
+  idunidaddetrabajo: number | null;
+  idambiente: number | null;
+  factura: string | null;
+  fechafactura: Date | null;
+  fechaincorporacion: Date | null;
   desincorporado: boolean;
   robado: boolean;
   chatarra: boolean;
-  fechadesincorporacion?: Date;
-  vidautil?: number;
-  valorDeRecuperacion?: number;
-  valorDeDepreciacion?: number;
+  fechadesincorporacion: Date | null;
+  vidautil: number | null;
+  valorDeRecuperacion: number | null;
+  valorDeDepreciacion: number | null;
   faltante: boolean;
   esperafactura: boolean;
   inoperativo: boolean;
-  otrosmemo?: string;
+  otrosmemo: string | null;
   fuerademural: boolean;
-  observaciones?: string;
-  codigop?: string;
+  observaciones: string | null;
+  codigop: string | null;
   vehiculo: boolean;
   maquinaria: boolean;
   marcadorGrupal: boolean;
@@ -46,16 +44,16 @@ export interface IBien {
   esrecolector: boolean;
   moto: boolean;
   inspeccion: boolean;
-  fechainspeccion?: Date;
-  iddependencias?: number;
+  fechainspeccion: Date | null;
+  iddependencias: number | null;
   deteriorado: boolean;
-  codigopresupuestario?: string;
+  codigopresupuestario: string | null;
   sc: boolean;
-  valorsoberano?: number;
-  obsoleto?: boolean;
-  denuncia?: string;
-  fechadenuncia?: Date;
-  asignado?: string;
+  valorsoberano: number | null;
+  obsoleto: boolean | null;
+  denuncia: string | null;
+  fechadenuncia: Date | null;
+  asignado: string | null;
 }
 
 // Interfaces para servicios
@@ -130,7 +128,45 @@ export interface LoginResponse {
 export interface CreateBienRequest {
   inventario: string;
   descripcion?: string;
-  // Agregar otros campos opcionales según necesidades
+  idsubgrupo?: number;
+  idseccion?: number;
+  valor?: number;
+  idunidaddetrabajo?: number;
+  idambiente?: number;
+  factura?: string;
+  fechafactura?: string;
+  fechaincorporacion?: string;
+  desincorporado?: boolean;
+  robado?: boolean;
+  chatarra?: boolean;
+  fechadesincorporacion?: string;
+  vidautil?: number;
+  valorDeRecuperacion?: number;
+  valorDeDepreciacion?: number;
+  faltante?: boolean;
+  esperafactura?: boolean;
+  inoperativo?: boolean;
+  otrosmemo?: string;
+  fuerademural?: boolean;
+  observaciones?: string;
+  codigop?: string;
+  vehiculo?: boolean;
+  maquinaria?: boolean;
+  marcadorGrupal?: boolean;
+  mantenimiento?: boolean;
+  esrecolector?: boolean;
+  moto?: boolean;
+  inspeccion?: boolean;
+  fechainspeccion?: string;
+  iddependencias?: number;
+  deteriorado?: boolean;
+  codigopresupuestario?: string;
+  sc?: boolean;
+  valorsoberano?: number;
+  obsoleto?: boolean;
+  denuncia?: string;
+  fechadenuncia?: string;
+  asignado?: string;
 }
 
 export interface UpdateBienRequest {
@@ -140,7 +176,7 @@ export interface UpdateBienRequest {
 
 export interface BienResponse {
   inventario: string;
-  descripcion?: string;
+  descripcion?: string | null;
   // Incluir campos relevantes
 }
 

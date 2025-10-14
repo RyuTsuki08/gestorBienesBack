@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserService } from '../services/userService';
 import { IUserController, CreateUserRequest, LoginRequest, UserResponse, LoginResponse } from '../types';
+import { createUserSchema, loginSchema, updateUserSchema, CreateUserInput, LoginInput, UpdateUserInput } from '../validations';
 
 const userService = new UserService();
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret'; // Configurar en .env
@@ -9,12 +10,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_secret'; // Configurar en 
 export class UserController implements IUserController {
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password, role }: CreateUserRequest = req.body;
-      if (!email || !password) {
-        res.status(400).json({ error: 'Email y password son requeridos' });
-        return;
-      }
-      const user = await userService.createUser({ email, password, role });
+      const validatedData: CreateUserInput = createUserSchema.parse(req.body);
+      const user = await userService.createUser(validatedData);
       const userResponse: UserResponse = {
         id: user.id,
         email: user.email,
@@ -24,7 +21,9 @@ export class UserController implements IUserController {
       };
       res.status(201).json(userResponse);
     } catch (error: any) {
-      if (error.code === 'P2002') {
+      if (error.name === 'ZodError') {
+        res.status(400).json({ error: 'Datos inválidos', details: error.errors });
+      } else if (error.code === 'P2002') {
         res.status(409).json({ error: 'Email ya existe' });
       } else {
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -34,12 +33,8 @@ export class UserController implements IUserController {
 
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password }: LoginRequest = req.body;
-      if (!email || !password) {
-        res.status(400).json({ error: 'Email y password son requeridos' });
-        return;
-      }
-      const user = await userService.authenticateUser(email, password);
+      const validatedData: LoginInput = loginSchema.parse(req.body);
+      const user = await userService.authenticateUser(validatedData.email, validatedData.password);
       if (!user) {
         res.status(401).json({ error: 'Credenciales inválidas' });
         return;
@@ -54,8 +49,12 @@ export class UserController implements IUserController {
       };
       const response: LoginResponse = { token, user: userResponse };
       res.json(response);
-    } catch (error) {
-      res.status(500).json({ error: 'Error interno del servidor' });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        res.status(400).json({ error: 'Datos inválidos', details: error.errors });
+      } else {
+        res.status(500).json({ error: 'Error interno del servidor' });
+      }
     }
   }
 
@@ -86,7 +85,8 @@ export class UserController implements IUserController {
         res.status(401).json({ error: 'No autorizado' });
         return;
       }
-      const updatedUser = await userService.updateUser(user.id, req.body);
+      const validatedData: UpdateUserInput = updateUserSchema.parse(req.body);
+      const updatedUser = await userService.updateUser(user.id, validatedData);
       const userResponse: UserResponse = {
         id: updatedUser.id,
         email: updatedUser.email,
@@ -95,8 +95,12 @@ export class UserController implements IUserController {
         updatedAt: updatedUser.updatedAt,
       };
       res.json(userResponse);
-    } catch (error) {
-      res.status(500).json({ error: 'Error interno del servidor' });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        res.status(400).json({ error: 'Datos inválidos', details: error.errors });
+      } else {
+        res.status(500).json({ error: 'Error interno del servidor' });
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+// This is your Prisma schema file for tests,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./test.db"
 }
 
 enum Role {
@@ -34,7 +34,7 @@ model Ambiente {
   idambiente           Int             @id @default(autoincrement()) @map("idambiente")
   nombreambiente       String?         @map("nombreambiente")
   idunidaddetrabajo    Int?            @default(0) @map("idunidaddetrabajo")
-  trial041             String?         @db.Char(1) @map("trial041")
+  trial041             String?          @map("trial041")
 
   transferenciasOrigen Transferencia[] @relation("TransferenciaAmbienteOrigen")
 
@@ -44,18 +44,18 @@ model Ambiente {
 model Bien {
   inventario             String     @id @map("inventario")
   descripcion            String?    @map("descripción")
-  idsubgrupo             Int?       @map("idsubgrupo")
-  idseccion              Int?       @map("idsección")
-  valor                  Float?     @map("valor")
-  idunidaddetrabajo      Int?       @map("idunidaddetrabajo")
-  idambiente             Int?       @map("idambiente")
+  idsubgrupo             Int?       @default(0) @map("idsubgrupo")
+  idseccion              Int?       @default(0) @map("idsección")
+  valor                  Float?     @default(0) @map("valor")
+  idunidaddetrabajo      Int?       @default(0) @map("idunidaddetrabajo")
+  idambiente             Int?       @default(0) @map("idambiente")
   factura                String?    @map("factura")
-  fechafactura           DateTime?  @db.Timestamp(6) @map("fechafactura")
-  fechaincorporacion     DateTime?  @db.Timestamp(6) @map("fechaincorporación")
+  fechafactura           DateTime?  @map("fechafactura")
+  fechaincorporacion     DateTime?  @map("fechaincorporación")
   desincorporado         Boolean    @default(false) @map("desincorporado")
   robado                 Boolean    @default(false) @map("robado")
   chatarra               Boolean    @default(false) @map("chatarra")
-  fechadesincorporacion  DateTime?  @db.Timestamp(6) @map("fechadesincorporación")
+  fechadesincorporacion  DateTime?  @map("fechadesincorporación")
   vidautil               Int?       @map("vidaútil")
   valorDeRecuperacion    Int?       @map("valorderecuparación")
   valorDeDepreciacion    Int?       @map("valordedepreciación")
@@ -73,16 +73,16 @@ model Bien {
   esrecolector           Boolean    @default(false) @map("esrecolector")
   moto                   Boolean    @default(false) @map("moto")
   inspeccion             Boolean    @default(false) @map("inspección")
-  fechainspeccion        DateTime?  @db.Timestamp(6) @map("fechainspeccion")
+  fechainspeccion        DateTime?  @map("fechainspeccion")
   iddependencias         Int?       @map("iddependencias")
   deteriorado            Boolean    @default(false) @map("deteriorado")
   codigopresupuestario   String?    @map("codigopresupuestario")
   sc                     Boolean    @default(false) @map("sc")
   valorsoberano          Float?     @map("valorsoberano")
-  trial054               String?    @db.Char(1) @map("trial054")
+  trial054               String?     @map("trial054")
   obsoleto               Boolean?   @map("obsoleto")
   denuncia               String?    @map("denuncia")
-  fechadenuncia          DateTime?  @db.Timestamp(6) @map("fechadenuncia")
+  fechadenuncia          DateTime?  @map("fechadenuncia")
   asignado               String?    @map("asignado")
 
   dependencia            Dependencia?     @relation(fields: [iddependencias], references: [iddependencias])
@@ -96,7 +96,7 @@ model Bien {
 model Dependencia {
   iddependencias Int    @id @default(autoincrement()) @map("iddependencias")
   dependencia    String? @map("dependencia")
-  trial048       String? @db.Char(1) @map("trial048")
+  trial048       String?  @map("trial048")
 
   bienes         Bien[]
 
@@ -106,7 +106,7 @@ model Dependencia {
 model Grupo {
   idgrupo     Int     @id @default(autoincrement()) @map("idgrupo")
   nombregrupo String? @map("nombregrupo")
-  trial061    String? @db.Char(1) @map("trial061")
+  trial061    String?  @map("trial061")
 
   @@map("grupo")
 }
@@ -125,7 +125,7 @@ model Seccion {
   idseccion      Int     @id @default(autoincrement()) @map("idsección")
   nombreseccion  String? @map("nombresección")
   idsubgrupo     Int?    @map("idsubgrupo")
-  trial067       String? @db.Char(1) @map("trial067")
+  trial067       String?  @map("trial067")
 
   subgrupo Subgrupo? @relation(fields: [idsubgrupo], references: [idsubgrupo])
 
@@ -135,7 +135,7 @@ model Seccion {
 model Subgrupo {
   idsubgrupo     Int      @id @default(autoincrement()) @map("idsubgrupo")
   nombresubgrupo String?  @map("nombresubgrupo")
-  trial064       String?  @db.Char(1) @map("trial064")
+  trial064       String?   @map("trial064")
 
   secciones Seccion[]
 
@@ -149,10 +149,10 @@ model Transferencia {
   idambienteorigen       Int?      @map("idambienteorigen")
   idunidaddetrabajodestino Int?    @map("idunidaddetrabajodestino")
   idambientedestino      Int?      @map("idambientedestino")
-  fechatransferencia     DateTime? @db.Timestamp(6) @map("fechatransferencia")
+  fechatransferencia     DateTime? @map("fechatransferencia")
   imprimir               Boolean   @default(true)  @map("imprimir")
   procesar               Boolean   @default(false) @map("procesar")
-  trial070               String?   @db.Char(1) @map("trial070")
+  trial070               String?    @map("trial070")
 
   bien            Bien?     @relation(fields: [inventario], references: [inventario])
   ambienteOrigen  Ambiente? @relation("TransferenciaAmbienteOrigen", fields: [idambienteorigen], references: [idambiente])
@@ -164,9 +164,9 @@ model UnidadDeTrabajo {
   idunidaddetrabajo Int     @id @default(autoincrement()) @map("idunidaddetrabajo")
   unidaddetrabajo   String? @map("unidaddetrabajo")
   localizacion      String? @map("localización")
-  jupiter           String? @map("júpiter")
+  jupiter           String?  @map("júpiter")
   telefono          String? @map("teléfono")
-  trial051          String? @db.Char(1) @map("trial051")
+  trial051          String?  @map("trial051")
 
   bienes Bien[]
 

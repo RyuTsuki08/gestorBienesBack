@@ -118,6 +118,16 @@ const options = {
             },
           },
         },
+        RefreshTokenRequest: {
+          type: 'object',
+          required: ['refreshToken'],
+          properties: {
+            refreshToken: {
+              type: 'string',
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            },
+          },
+        },
         RegisterRequest: {
           type: 'object',
           required: ['email', 'password'],

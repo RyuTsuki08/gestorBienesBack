@@ -71,6 +71,7 @@ export interface IBienService {
   createBien(data: CreateBienRequest): Promise<IBien>;
   findBienByInventario(inventario: string): Promise<IBien | null>;
   getAllBienes(): Promise<IBien[]>;
+  getAllBienesPaginated(page: number, limit: number): Promise<{ data: IBien[]; total: number }>;
   updateBien(inventario: string, data: Partial<UpdateBienRequest>): Promise<IBien>;
   deleteBien(inventario: string): Promise<void>;
   // Agregar métodos adicionales según necesidades (ej. búsqueda por unidad, etc.)
@@ -80,6 +81,7 @@ export interface IBienService {
 export interface IUserController {
   register(req: any, res: any): Promise<void>;
   login(req: any, res: any): Promise<void>;
+  refreshToken(req: any, res: any): Promise<void>;
   getProfile(req: any, res: any): Promise<void>;
   updateProfile(req: any, res: any): Promise<void>;
   getAllUsers(req: any, res: any): Promise<void>;
@@ -122,6 +124,17 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
+  refreshToken: string;
+  user: UserResponse;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface RefreshTokenResponse {
+  token: string;
+  refreshToken: string;
   user: UserResponse;
 }
 
@@ -171,13 +184,105 @@ export interface CreateBienRequest {
 
 export interface UpdateBienRequest {
   descripcion?: string;
-  // Agregar otros campos
+  idsubgrupo?: number;
+  idseccion?: number;
+  valor?: number;
+  idunidaddetrabajo?: number;
+  idambiente?: number;
+  factura?: string;
+  fechafactura?: string;
+  fechaincorporacion?: string;
+  desincorporado?: boolean;
+  robado?: boolean;
+  chatarra?: boolean;
+  fechadesincorporacion?: string;
+  vidautil?: number;
+  valorDeRecuperacion?: number;
+  valorDeDepreciacion?: number;
+  faltante?: boolean;
+  esperafactura?: boolean;
+  inoperativo?: boolean;
+  otrosmemo?: string;
+  fuerademural?: boolean;
+  observaciones?: string;
+  codigop?: string;
+  vehiculo?: boolean;
+  maquinaria?: boolean;
+  marcadorGrupal?: boolean;
+  mantenimiento?: boolean;
+  esrecolector?: boolean;
+  moto?: boolean;
+  inspeccion?: boolean;
+  fechainspeccion?: string;
+  iddependencias?: number;
+  deteriorado?: boolean;
+  codigopresupuestario?: string;
+  sc?: boolean;
+  valorsoberano?: number;
+  obsoleto?: boolean;
+  denuncia?: string;
+  fechadenuncia?: string;
+  asignado?: string;
+  imagenes?: string[];
 }
 
 export interface BienResponse {
   inventario: string;
-  descripcion?: string | null;
-  // Incluir campos relevantes
+  descripcion: string | null;
+  idsubgrupo: number | null;
+  idseccion: number | null;
+  valor: number | null;
+  idunidaddetrabajo: number | null;
+  idambiente: number | null;
+  factura: string | null;
+  fechafactura: Date | null;
+  fechaincorporacion: Date | null;
+  desincorporado: boolean;
+  robado: boolean;
+  chatarra: boolean;
+  fechadesincorporacion: Date | null;
+  vidautil: number | null;
+  valorDeRecuperacion: number | null;
+  valorDeDepreciacion: number | null;
+  faltante: boolean;
+  esperafactura: boolean;
+  inoperativo: boolean;
+  otrosmemo: string | null;
+  fuerademural: boolean;
+  observaciones: string | null;
+  codigop: string | null;
+  vehiculo: boolean;
+  maquinaria: boolean;
+  marcadorGrupal: boolean;
+  mantenimiento: boolean;
+  esrecolector: boolean;
+  moto: boolean;
+  inspeccion: boolean;
+  fechainspeccion: Date | null;
+  iddependencias: number | null;
+  deteriorado: boolean;
+  codigopresupuestario: string | null;
+  sc: boolean;
+  valorsoberano: number | null;
+  obsoleto: boolean | null;
+  denuncia: string | null;
+  fechadenuncia: Date | null;
+  asignado: string | null;
+}
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 // Interfaces para middlewares

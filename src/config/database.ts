@@ -25,6 +25,12 @@
   };
   console.log('Configuración de base de datos lista:', { isLocal, DATABASE_URL });
 
+  // Configuración de Supabase para storage
+  export const supabaseConfig = {
+    url: process.env.SUPABASE_URL || '',
+    anonKey: process.env.SUPABASE_ANON_KEY || '',
+  };
+
   
 export default config;
 

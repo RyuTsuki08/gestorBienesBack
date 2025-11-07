@@ -79,39 +79,77 @@ tests/                     # Pruebas
 
 ## Instalación y Uso
 
-1. Instalar dependencias:
+### Requisitos previos
+- Node.js (versión 16 o superior)
+- Docker y Docker Compose (para la base de datos PostgreSQL local)
+- npm o yarn
+
+### Pasos para ejecutar el proyecto
+
+1. **Instalar dependencias**:
 ```bash
 npm install
 ```
 
-2. Configurar variables de entorno (copiar `.env.example` a `.env`):
-```bash
-cp .env.example .env
-```
+2. **Configurar la base de datos**:
+   El proyecto está configurado para usar PostgreSQL local con Docker. Asegúrate de que el archivo `.env` tenga las variables correctas (ya tienes configurado `NODE_ENV='local'`).
 
-3. Ejecutar migraciones de base de datos:
+   Ejecuta la base de datos con Docker Compose:
+```bash
+npm run docker:local
+```
+   Esto iniciará PostgreSQL en el puerto 5432.
+
+3. **Ejecutar migraciones de Prisma**:
 ```bash
 npm run prisma:migrate
 ```
+   Esto aplicará las migraciones y creará las tablas en la base de datos.
 
-4. Generar cliente Prisma:
+4. **Generar el cliente de Prisma**:
 ```bash
 npm run prisma:generate
 ```
 
-5. Ejecutar en desarrollo:
+5. **Ejecutar la aplicación en modo desarrollo**:
 ```bash
 npm run dev
 ```
+   La aplicación se ejecutará en `http://localhost:3000`.
 
-6. Acceder a la documentación API:
-   - Abrir en navegador: `http://localhost:3000/api-docs`
-   - Endpoints disponibles con ejemplos interactivos
+### Probar con Swagger UI
 
-7. Ejecutar pruebas:
-```bash
-npm test
-```
+Una vez que la aplicación esté ejecutando:
+
+1. Abre tu navegador y ve a: `http://localhost:3000/api-docs`
+2. Verás la interfaz de Swagger UI con toda la documentación de la API.
+
+#### Endpoints disponibles:
+- **GET /** - Ruta de prueba
+- **GET /api/health** - Verificar estado de la aplicación y conexión a DB
+- **POST /api/users/register** - Registrar usuario
+- **POST /api/users/login** - Iniciar sesión (obtiene token JWT)
+- **GET /api/users/profile** - Obtener perfil (requiere auth)
+- **PUT /api/users/profile** - Actualizar perfil (requiere auth)
+- **GET /api/users** - Listar usuarios (solo ADMIN)
+- **DELETE /api/users/:id** - Eliminar usuario (solo ADMIN)
+- **POST /api/bienes** - Crear bien (requiere auth)
+- **GET /api/bienes/:inventario** - Obtener bien (requiere auth)
+- **GET /api/bienes** - Listar bienes (requiere auth)
+- **PUT /api/bienes/:inventario** - Actualizar bien (requiere auth)
+- **DELETE /api/bienes/:inventario** - Eliminar bien (requiere auth)
+
+#### Para probar endpoints protegidos:
+1. Primero registra un usuario o inicia sesión para obtener un token JWT.
+2. En Swagger UI, haz clic en "Authorize" (botón en la parte superior derecha).
+3. Ingresa el token en el formato: `Bearer <tu_token_jwt>`
+4. Ahora puedes probar los endpoints que requieren autenticación.
+
+### Comandos adicionales útiles
+- `npm test` - Ejecutar tests
+- `npm run build` - Compilar TypeScript
+- `npm start` - Ejecutar en producción (después de build)
+- `npm run prisma:studio` - Abrir Prisma Studio para ver/editar la base de datos
 
 ## API Endpoints
 

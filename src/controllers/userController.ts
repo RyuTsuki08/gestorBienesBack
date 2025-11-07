@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserService } from '../services/userService';
-import { IUserController, CreateUserRequest, LoginRequest, UserResponse, LoginResponse } from '../types';
+import { IUserController, CreateUserRequest, LoginRequest, UserResponse, LoginResponse, RefreshTokenResponse } from '../types';
 import { createUserSchema, loginSchema, updateUserSchema, CreateUserInput, LoginInput, UpdateUserInput } from '../validations';
 
 const userService = new UserService();
@@ -39,7 +39,8 @@ export class UserController implements IUserController {
         res.status(401).json({ error: 'Credenciales inválidas' });
         return;
       }
-      const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '15m' });
+      const refreshToken = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
       const userResponse: UserResponse = {
         id: user.id,
         email: user.email,
@@ -47,7 +48,7 @@ export class UserController implements IUserController {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       };
-      const response: LoginResponse = { token, user: userResponse };
+      const response: LoginResponse = { token, refreshToken, user: userResponse };
       res.json(response);
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -122,6 +123,53 @@ export class UserController implements IUserController {
       res.json(usersResponse);
     } catch (error) {
       res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        res.status(400).json({ error: 'Refresh token requerido' });
+        return;
+      }
+
+      // Verificar el refresh token
+      const decoded = jwt.verify(refreshToken, JWT_SECRET) as any;
+      const user = await userService.findUserById(decoded.id);
+
+      if (!user) {
+        res.status(401).json({ error: 'Usuario no encontrado' });
+        return;
+      }
+
+      // Generar nuevos tokens
+      const newToken = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '15m' });
+      const newRefreshToken = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+
+      const userResponse: UserResponse = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+
+      const response: RefreshTokenResponse = {
+        token: newToken,
+        refreshToken: newRefreshToken,
+        user: userResponse
+      };
+
+      res.json(response);
+    } catch (error: any) {
+      if (error.name === 'JsonWebTokenError') {
+        res.status(401).json({ error: 'Refresh token inválido' });
+      } else if (error.name === 'TokenExpiredError') {
+        res.status(401).json({ error: 'Refresh token expirado' });
+      } else {
+        res.status(500).json({ error: 'Error interno del servidor' });
+      }
     }
   }
 

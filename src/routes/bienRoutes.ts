@@ -5,6 +5,9 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 const router = Router();
 const bienController = new BienController();
 
+// Importar multer desde el controlador
+const { upload } = require('../controllers/bienController');
+
 /**
  * @swagger
  * /api/bienes:
@@ -186,7 +189,7 @@ router.get('/', authMiddleware, bienController.getAllBienes.bind(bienController)
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/:inventario', authMiddleware, bienController.updateBien.bind(bienController));
+router.put('/:inventario', authMiddleware, upload.array('imagenes', 10), bienController.updateBien.bind(bienController));
 
 /**
  * @swagger
@@ -220,5 +223,68 @@ router.put('/:inventario', authMiddleware, bienController.updateBien.bind(bienCo
  *               $ref: '#/components/schemas/Error'
  */
 router.delete('/:inventario', authMiddleware, bienController.deleteBien.bind(bienController));
+
+/**
+ * @swagger
+ * /api/bienes/{inventario}/upload-images:
+ *   post:
+ *     summary: Subir imágenes para un bien
+ *     tags: [Bienes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: inventario
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Número de inventario del bien
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imagenes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Archivos de imagen (máximo 10, 5MB cada uno)
+ *     responses:
+ *       200:
+ *         description: Imágenes subidas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 imagenes:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       400:
+ *         description: No se encontraron archivos o error de validación
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: No autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/:inventario/upload-images', authMiddleware, upload.array('imagenes', 10), bienController.uploadImages.bind(bienController));
 
 export default router;
